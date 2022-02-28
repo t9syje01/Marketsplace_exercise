@@ -1,0 +1,403 @@
+openapi: 3.1.0
+info:
+  title: Maketplace
+  version: '1.0'
+  summary: Buy and sell application API
+  contact:
+    name: Jenni Syrjälä
+    email: t9syje01@students.oamk.fi
+servers:
+  - url: 'http://localhost:3000'
+    description: Jenni Syrjälä
+paths:
+  '/users/{userId}':
+    parameters:
+      - schema:
+          type: integer
+        name: userId
+        in: path
+        required: true
+        description: Id of an existing user.
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        '200':
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                Get User Alice Smith:
+                  value:
+                    id: 142
+                    firstName: Alice
+                    lastName: Smith
+                    email: alice.smith@gmail.com
+                    dateOfBirth: '1997-10-31'
+                    emailVerified: true
+                    signUpDate: '2019-08-24'
+        '404':
+          description: User Not Found
+      operationId: get-users-userId
+      description: Retrieve the information of the user with the matching user ID.
+    put:
+      summary: User information
+      operationId: put-users-userId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+        '409':
+          description: Email Already Taken
+      description: Update the information of an existing user.
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+  /user:
+    post:
+      summary: Create New User
+      operationId: post-user
+      responses:
+        '200':
+          description: User Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                New User Bob Fellow:
+                  value:
+                    id: 12
+                    firstName: Bob
+                    lastName: Fellow
+                    email: bob.fellow@gmail.com
+                    dateOfBirth: '1996-08-24'
+                    emailVerified: false
+                    createDate: '2020-11-18'
+        '400':
+          description: Missing Required Information
+        '409':
+          description: Email Already Taken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                dateOfBirth:
+                  type: string
+                  format: date
+              required:
+                - firstName
+                - lastName
+                - email
+                - dateOfBirth
+            examples:
+              Create User Bob Fellow:
+                value:
+                  firstName: Bob
+                  lastName: Fellow
+                  email: bob.fellow@gmail.com
+                  dateOfBirth: '1996-08-24'
+        description: Post the necessary fields for the API to create a new user.
+      description: Create a new user.
+      security:
+        - JWT: []
+    get:
+      summary: ''
+      operationId: get-user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /products:
+    get:
+      summary: Get all markets data
+      tags: []
+      operationId: get-Markets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product'
+      description: ''
+    parameters: []
+    post:
+      summary: Create new product to sell
+      operationId: post-product
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors Found:
+                    type: string
+      description: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/product'
+      security:
+        - JWT: []
+  '/products{productsId}':
+    parameters:
+      - schema:
+          type: string
+        name: productsId
+        in: path
+        required: true
+    get:
+      summary: Delete product
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product'
+              examples:
+                example-1:
+                  value:
+                    id: 0
+                    title: string
+                    category: string
+                    description: string
+                    location: string
+                    price: string
+                    date: '2022-02-24'
+                    shipping: true
+                    pickup: true
+                    info: string
+                    images1: string
+                    images2: string
+                    images3: string
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+      operationId: get-product-productId
+      description: ''
+    put:
+      summary: Modify product
+      operationId: put-product-productId
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorDescription:
+                    type: string
+        '404':
+          description: Not Found
+      description: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/product'
+      security:
+        - JWT: []
+    delete:
+      summary: ''
+      operationId: delete-product-productId
+      responses:
+        '202':
+          description: Accepted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      security:
+        - JWT: []
+  /login:
+    post:
+      summary: Login for users
+      operationId: post-login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+              examples:
+                example-1:
+                  value:
+                    token: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      description: User can change login information
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      description: User description
+      examples:
+        - id: 142
+          firstName: Alice
+          lastName: Smith
+          email: alice.smith@gmail.com
+          dateOfBirth: '1997-10-31'
+          emailVerified: true
+          signUpDate: '2019-08-24'
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the given user.
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        dateOfBirth:
+          type: string
+          format: date
+          example: '1997-10-31'
+        emailVerified:
+          type: boolean
+          description: Set to true if the user's email has been verified.
+        createDate:
+          type: string
+          format: date
+          description: The date that the user was created.
+          example: '2022-02-25'
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - emailVerified
+    product:
+      title: Products
+      type: object
+      examples:
+        - id: 0
+          title: string
+          category: string
+          description: string
+          location: string
+          price: string
+          date: '2022-02-24'
+          shipping: true
+          pickup: true
+          info: string
+          images1: string
+          images2: string
+          images3: string
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        price:
+          type: string
+        date:
+          type: string
+          format: date
+          example: '2022-02-24'
+          description: ISO 8601
+        shipping:
+          type: boolean
+          default: true
+        pickup:
+          type: boolean
+          default: true
+        sellersInfo:
+          description: Name and contact info
+          type: string
+        images1:
+          type: string
+        images2:
+          type: string
+        images3:
+          type: string
+      required:
+        - title
+        - category
+        - description
+        - price
+        - date
+        - shipping
+        - pickup
+        - sellersInfo
+        - images1
+    Login:
+      title: Login
+      type: object
+      properties:
+        userName:
+          type: string
+        password:
+          type: string
+      required:
+        - userName
+        - password
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+    basic:
+      type: http
+      scheme: basic
