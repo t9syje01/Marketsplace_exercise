@@ -76,7 +76,7 @@ app.get('/products/:id', (req, res)=> {
 })
 
 app.delete('/products/:productsId', (req,res) => {
-    let foundIndex(t=> t.id === parseInt(req.params.productsId));
+    let foundIndex = products.findIndex(t=> t.id === parseInt(req.params.productsId));
 
     if(foundIndex ==-1) {
         res.sendStatus (404);
